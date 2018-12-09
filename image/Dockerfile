@@ -2,7 +2,7 @@ FROM debian:9.6-slim
 
 RUN apt update \
     && DEBIAN_FRONTEND=noninteractive apt -y upgrade \
-    && DEBIAN_FRONTEND=noninteractive apt -y install strongswan iptables uuid-runtime ndppd openssl \
+    && DEBIAN_FRONTEND=noninteractive apt -y install strongswan iptables uuid-runtime ndppd pwgen nano \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 ADD ./etc/* /etc/

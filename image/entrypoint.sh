@@ -2,14 +2,18 @@
 
 set -e
 
-if [ -z "$SHARED_SECRET" ]
+if [ -f /config/shared.secret ]
 then
-    SHARED_SECRET="$(openssl rand -base64 128 2>/dev/null)"
-fi
+    SHARED_SECRET=$(cat /config/shared.secret)
+else
 
-if [ ! -f /config/shared.secret ]
-then
+    if [ -z "$SHARED_SECRET" ]
+    then
+        SHARED_SECRET="$(pwgen -s 128 1 2>/dev/null)"
+    fi
+
     echo ${SHARED_SECRET} > /config/shared.secret
+
 fi
 
 echo ": PSK \"${SHARED_SECRET}\"" > /etc/ipsec.secrets

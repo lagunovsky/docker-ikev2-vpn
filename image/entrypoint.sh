@@ -7,12 +7,12 @@ then
     SHARED_SECRET="$(openssl rand -base64 128 2>/dev/null)"
 fi
 
-if [ ! -f /config/ipsec.secrets ]
+if [ ! -f /config/shared.secret ]
 then
-    echo ": PSK \"${SHARED_SECRET}\"" > /config/ipsec.secrets
+    echo ${SHARED_SECRET} > /config/shared.secret
 fi
 
-echo /config/ipsec.secrets > /etc/ipsec.secrets
+echo ": PSK \"${SHARED_SECRET}\"" > /etc/ipsec.secrets
 
 if [ $# -eq 0 ]
 then

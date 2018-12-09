@@ -2,7 +2,7 @@ version: '3'
 
 services:
   ikev2:
-    image: lagun4ik/ikev2-vpn:${VERSION:-1.0.0}
+    image: lagun4ik/ikev2-vpn:${VERSION:-1.1.0}
     restart: always
     privileged: true
     env_file: ./data/env/ikev2.env

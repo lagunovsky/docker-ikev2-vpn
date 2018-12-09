@@ -1,3 +1,3 @@
 data/env/ikev2.env
-data/config/ipsec.secrets
+data/config/shared.secret
 ikev2-vpn.mobileconfig

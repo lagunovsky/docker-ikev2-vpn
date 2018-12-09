@@ -33,7 +33,7 @@
 
 # These variable, especially CONN_UUID, are bind to per username,
 # which currently, all users share the same secrets and configurations.
-: ${CONN_NAME="My IKEv2 VPN"}
+: ${CONN_NAME="Private IKEv2 VPN"}
 : ${CONN_IDENTIFIER="${PROFILE_IDENTIFIER}.shared-configuration"}
 : ${CONN_UUID=$(uuidgen)}
 : ${CONN_HOST=${HOST}}

@@ -2,15 +2,20 @@ version: '3'
 
 services:
   ikev2:
-    image: lagun4ik/ikev2-vpn:${VERSION:-1.2.0}
+    image: lagun4ik/ikev2-vpn:${VERSION:-2.0.0}
+    build:
+      context: './image'
     restart: always
     privileged: true
-    env_file: ./data/env/ikev2.env
+    environment:
+      - HOST_NAME=${HOST_NAME:-Private VPN}
+      - HOST_IP=${HOST_IP}
+      - HOST_COUNTRY=${HOST_COUNTRY}
     ports:
-    - "500:500/udp"
-    - "4500:4500/udp"
+      - "500:500/udp"
+      - "4500:4500/udp"
     volumes:
-    - ./data/config:/config
+      - ./data:/data
     logging: &loggingConfig
       driver: json-file
       options:

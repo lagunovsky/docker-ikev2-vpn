@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+if [ $# -eq 0 ]
+then
+    create-host-cert
+    exec start-vpn
+else
+    exec ${*}
+fi

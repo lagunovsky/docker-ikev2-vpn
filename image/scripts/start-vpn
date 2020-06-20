@@ -1,0 +1,39 @@
+#!/bin/bash
+set -e
+
+if [ -z "$HOST_IP" ]; then
+    HOST_IP=$(curl -s https://ipecho.net/plain)
+fi
+
+sysctl -w net.ipv4.ip_forward=1
+sysctl -w net.ipv4.ip_no_pmtu_disc=1
+sysctl -w net.ipv4.conf.all.send_redirects=0
+sysctl -w net.ipv4.conf.all.accept_redirects=0
+#sysctl net.ipv6.conf.all.forwarding=1
+#sysctl net.ipv6.conf.eth0.proxy_ndp=1
+
+### VPN NAT
+iptables -t nat -A POSTROUTING -s 10.10.10.0/24 -o eth0 -m policy --dir out --pol ipsec -j ACCEPT
+iptables -t nat -A POSTROUTING -s 10.10.10.0/24 -o eth0 -j MASQUERADE
+#ip6tables -t nat -A POSTROUTING -s fd6a:6ce3:c8d8:7caa::/64 -o eth0 -m policy --dir out --pol ipsec -j ACCEPT
+#ip6tables -t nat -A POSTROUTING -s fd6a:6ce3:c8d8:7caa::/64 -o eth0 -j MASQUERADE
+
+### ISAKMP (handling of security associations)
+iptables -A INPUT -p udp --dport 500 --j ACCEPT
+
+### NAT-T (handling of IPsec between NAT-Ted devices)
+iptables -A INPUT -p udp --dport 4500 --j ACCEPT
+
+### ESP payload (the encrypted data packets)
+iptables -A INPUT -p esp -j ACCEPT
+
+### VPN MSS CLAMPING TO IPSEC/VIRTUAL IP's
+iptables -t mangle -A FORWARD -o eth0 \
+-p tcp -m tcp --tcp-flags SYN,RST SYN \
+-m tcpmss --mss 1361:1536 \
+-j TCPMSS --set-mss 1360
+
+envsubst '${HOST_IP}' < /var/templates/conf/ipsec.conf.template > /etc/ipsec.conf
+envsubst '${HOST_IP}' < /var/templates/conf/ipsec.secrets.template > /etc/ipsec.secrets
+
+ipsec start --nofork

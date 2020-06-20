@@ -1,0 +1,143 @@
+#!/bin/bash
+
+
+CLIENT_P12=${1}-client.p12
+CERT_PAYLOAD=$(cat /data/${CLIENT_P12} | openssl enc -base64)
+CERT_NAME=${CLIENT_P12}
+CLIENT_IDENTIFIER=${1}
+PROFILE_NAME="${HOST_NAME} (${1})"
+CONFIG_UUID=$(uuidgen)
+PROFILE_UUID=$(uuidgen)
+VPN_UUID=$(uuidgen)
+CERT_UUID=$(uuidgen)
+
+cat <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>Password</key>
+			<string>${2}</string>
+			<key>PayloadCertificateFileName</key>
+			<string>${CERT_NAME}</string>
+			<key>PayloadContent</key>
+			<data>
+${CERT_PAYLOAD}
+			</data>
+			<key>PayloadDescription</key>
+			<string>Adds a PKCS#12-formatted certificate</string>
+			<key>PayloadDisplayName</key>
+			<string>${CERT_NAME}</string>
+			<key>PayloadIdentifier</key>
+			<string>com.apple.security.pkcs12.${CERT_UUID}</string>
+			<key>PayloadType</key>
+			<string>com.apple.security.pkcs12</string>
+			<key>PayloadUUID</key>
+			<string>${CERT_UUID}</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>IKEv2</key>
+			<dict>
+				<key>AuthenticationMethod</key>
+				<string>Certificate</string>
+				<key>CertificateType</key>
+				<string>ECDSA256</string>
+				<key>ChildSecurityAssociationParameters</key>
+				<dict>
+					<key>DiffieHellmanGroup</key>
+					<integer>19</integer>
+					<key>EncryptionAlgorithm</key>
+					<string>AES-128</string>
+					<key>IntegrityAlgorithm</key>
+					<string>SHA2-256</string>
+					<key>LifeTimeInMinutes</key>
+					<integer>1440</integer>
+				</dict>
+				<key>DeadPeerDetectionRate</key>
+				<string>Medium</string>
+				<key>DisableMOBIKE</key>
+				<integer>0</integer>
+				<key>DisableRedirect</key>
+				<false/>
+				<key>EnableCertificateRevocationCheck</key>
+				<integer>0</integer>
+				<key>EnableFallback</key>
+				<integer>0</integer>
+				<key>EnablePFS</key>
+				<true/>
+				<key>IKESecurityAssociationParameters</key>
+				<dict>
+					<key>DiffieHellmanGroup</key>
+					<integer>19</integer>
+					<key>EncryptionAlgorithm</key>
+					<string>AES-128</string>
+					<key>IntegrityAlgorithm</key>
+					<string>SHA2-256</string>
+					<key>LifeTimeInMinutes</key>
+					<integer>1440</integer>
+				</dict>
+				<key>LocalIdentifier</key>
+				<string>${CLIENT_IDENTIFIER}</string>
+				<key>OnDemandEnabled</key>
+				<integer>1</integer>
+				<key>OnDemandRules</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>Connect</string>
+					</dict>
+				</array>
+				<key>PayloadCertificateUUID</key>
+				<string>${CERT_UUID}</string>
+				<key>RemoteAddress</key>
+				<string>${HOST_IP}</string>
+				<key>RemoteIdentifier</key>
+				<string>${HOST_IP}</string>
+				<key>UseConfigurationAttributeInternalIPSubnet</key>
+				<integer>0</integer>
+			</dict>
+			<key>PayloadDescription</key>
+			<string>Configures VPN settings</string>
+			<key>PayloadDisplayName</key>
+			<string>VPN</string>
+			<key>PayloadIdentifier</key>
+			<string>com.apple.vpn.managed.${VPN_UUID}</string>
+			<key>PayloadType</key>
+			<string>com.apple.vpn.managed</string>
+			<key>PayloadUUID</key>
+			<string>${VPN_UUID}</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>Proxies</key>
+			<dict>
+				<key>HTTPEnable</key>
+				<integer>0</integer>
+				<key>HTTPSEnable</key>
+				<integer>0</integer>
+			</dict>
+			<key>UserDefinedName</key>
+			<string>${HOST_NAME}</string>
+			<key>VPNType</key>
+			<string>IKEv2</string>
+		</dict>
+	</array>
+	<key>PayloadDisplayName</key>
+	<string>${PROFILE_NAME}</string>
+	<key>PayloadIdentifier</key>
+	<string>${PROFILE_NAME}.${PROFILE_UUID}</string>
+	<key>PayloadRemovalDisallowed</key>
+	<false/>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>${CONFIG_UUID}</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>
+EOF

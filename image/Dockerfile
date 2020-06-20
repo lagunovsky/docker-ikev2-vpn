@@ -1,16 +1,17 @@
-FROM debian:9.6-slim
+FROM alpine:3.12
 
-RUN apt update \
-    && DEBIAN_FRONTEND=noninteractive apt -y upgrade \
-    && DEBIAN_FRONTEND=noninteractive apt -y install strongswan iptables uuid-runtime ndppd pwgen nano \
-    && rm -rf /var/lib/{apt,dpkg,cache,log}/
+RUN apk update && \
+    apk add openssl strongswan curl nano bash jq libintl libuuid && \
+    apk add --virtual build_deps gettext util-linux && \ 
+    cp /usr/bin/envsubst /usr/local/bin/envsubst && \
+    cp /usr/bin/uuidgen /usr/local/bin/uuidgen && \
+    apk del build_deps && rm -rf /var/cache/apk/* && \
+    mkdir /data
 
-ADD ./etc/* /etc/
-ADD ./bin/* /usr/bin/
-ADD ./entrypoint.sh /entrypoint.sh
+COPY ./templates/ /var/templates/
+COPY ./scripts/ /usr/local/bin/
 
-VOLUME [ "/config" ]
+EXPOSE 500:500/udp 4500:4500/udp
 
-EXPOSE 500/udp 4500/udp
-
-ENTRYPOINT [ "/entrypoint.sh" ]
+VOLUME [ "/data", "/etc/ipsec.d" ]
+ENTRYPOINT [ "/usr/local/bin/entrypoint" ]

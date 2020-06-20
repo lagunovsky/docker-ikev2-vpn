@@ -1,0 +1,17 @@
+#!/bin/bash
+
+read -s -p "Password (empty for skip): " password
+echo
+
+emptypassword=0
+if [ -z ${password} ]; then
+    password=12345
+    emptypassword=1
+fi
+
+if [ $emptypassword -eq 0 ];
+then
+echo 00000
+else
+echo 1111
+fi

@@ -1,0 +1,34 @@
+#!/bin/bash
+
+. $(dirname "$0")/create-cert-common
+
+if [ ! -f ${PRIVATE_PATH}/${STRONGSWAN_KEY} ]
+then
+        echo "Creating certificate authority...."
+
+        ipsec pki --gen --type ecdsa --size 384 --outform pem > ${PRIVATE_PATH}/${STRONGSWAN_KEY}
+        chmod 600 ${PRIVATE_PATH}/${STRONGSWAN_KEY}
+
+        ipsec pki --self --ca --lifetime 3650 \
+                --in ${PRIVATE_PATH}/${STRONGSWAN_KEY} --type ecdsa \
+                --dn "C=${HOST_COUNTRY}, O=strongSwan, CN=${HOST_NAME} Root CA" \
+                --outform pem \
+                > ${CACERTS_PATH}/${STRONGSWAN_CERT}
+fi
+
+if [ ! -f ${PRIVATE_PATH}/${SERVER_CERT} ]
+then
+        echo "Creating VPN host certificate...."
+
+        ipsec pki --gen --type ecdsa --size 256 --outform pem > ${PRIVATE_PATH}/${SERVER_CERT}
+        chmod 600 ${PRIVATE_PATH}/${SERVER_CERT}
+
+        ipsec pki --pub --in ${PRIVATE_PATH}/${SERVER_CERT} --type ecdsa | \
+                ipsec pki --issue --lifetime 730 \
+                --cacert ${CACERTS_PATH}/${STRONGSWAN_CERT} \
+                --cakey ${PRIVATE_PATH}/${STRONGSWAN_KEY} \
+                --dn "C=${HOST_COUNTRY}, O=strongSwan, CN=${HOST_IP}" \
+                --san ${HOST_IP} \
+                --flag serverAuth --flag ikeIntermediate \
+                --outform pem > ${CERTS_PATH}/${SERVER_CERT}
+fi

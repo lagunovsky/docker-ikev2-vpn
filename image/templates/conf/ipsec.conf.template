@@ -1,0 +1,40 @@
+# ipsec.conf - strongSwan IPsec configuration file
+
+config setup
+  uniqueids=never
+  charondebug="cfg 2, dmn 2, ike 2, net 2"
+
+conn %default
+  type=tunnel
+  auto=start
+  ikelifetime=1440m
+  compression=no
+  closeaction=restart
+  keyexchange=ikev2
+  ike=aes128-sha256-ecp256
+  esp=aes128-sha256-ecp256
+  dpdaction=clear
+  dpddelay=300s
+  dpdtimeout=5s
+  forceencaps=yes
+  fragmentation=yes 
+  keyingtries=5
+  rekey=yes
+  mobike=yes
+
+  # server-side
+  left=%any
+  leftfirewall=yes
+  leftid=$HOST_IP
+  leftsubnet=0.0.0.0/0
+  leftcert=$HOST_IP-server-cert.pem
+  leftsendcert=always
+
+  # client-side
+  right=%any
+  rightdns=1.1.1.1
+  rightsourceip=10.10.10.0/24
+
+conn IKEv2
+  rightauth=pubkey
+  eap_identity=%any

@@ -1,0 +1,61 @@
+#!/bin/bash
+
+. $(dirname "$0")/create-host-cert
+
+if [ ! -f /data/${STRONGSWAN_CERT} ]; then
+        cp ${CACERTS_PATH}/${STRONGSWAN_CERT} /data/${STRONGSWAN_CERT}
+fi
+
+read -p "Client: " client
+
+CLIENT_CERT=${client}-client-cert.pem
+CLIENT_KEY=${client}-client-key.pem
+CLIENT_P12=${client}-client.p12
+
+if [ -f ${PRIVATE_PATH}/${CLIENT_KEY} ]; then
+        echo "${client} certificate already exist"
+fi
+
+read -s -p "Password (empty for skip): " password
+echo
+
+emptypassword=0
+if [ -z ${password} ]; then
+    password=empty-password
+    emptypassword=1
+fi
+
+echo "Creating ${client} certificate...."
+
+ipsec pki --gen --type ecdsa --size 256 --outform pem > ${PRIVATE_PATH}/${CLIENT_KEY}
+chmod 600 ${PRIVATE_PATH}/${CLIENT_KEY}
+
+ipsec pki --pub --in ${PRIVATE_PATH}/${CLIENT_KEY} --type ecdsa | \
+        ipsec pki --issue --lifetime 730 \
+        --cacert ${CACERTS_PATH}/${STRONGSWAN_CERT} \
+        --cakey ${PRIVATE_PATH}/${STRONGSWAN_KEY} \
+        --dn "C=${HOST_COUNTRY}, O=strongSwan, CN=${client}" \
+        --san ${client} \
+        --outform pem > ${CERTS_PATH}/${CLIENT_CERT}
+
+cp ${CERTS_PATH}/${CLIENT_CERT} /data/${CLIENT_CERT}
+
+echo "Exporting  ${client} certificate as PKCS#12 file...."
+
+openssl pkcs12 -export -inkey ${PRIVATE_PATH}/${CLIENT_KEY} \
+        -in ${CERTS_PATH}/${CLIENT_CERT} -name "${client} VPN Certificate" \
+        -certfile ${CACERTS_PATH}/${STRONGSWAN_CERT} \
+        -caname "${HOST_NAME} Root CA" \
+        -passout pass:${password} \
+        -out /data/${CLIENT_P12}
+
+echo "Creating mobileconfig file...."
+
+if [ $emptypassword -eq 0 ];
+then
+        create-mobileconfig ${client} > /data/${client}.mobileconfig
+else
+        create-mobileconfig ${client} ${password} > /data/${client}.mobileconfig
+fi
+
+echo "Creating cert success"

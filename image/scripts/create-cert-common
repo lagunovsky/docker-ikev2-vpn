@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+if [ -z "$HOST_IP" ]; then
+    HOST_IP=$(curl -s https://ipecho.net/plain)
+fi
+
+if [ -z "$HOST_COUNTRY" ]; then
+    HOST_COUNTRY=$(curl -s 'https://ipinfo.io' | jq -r '.country')
+fi
+
+PRIVATE_PATH=/etc/ipsec.d/private
+CACERTS_PATH=/etc/ipsec.d/cacerts
+CERTS_PATH=/etc/ipsec.d/certs
+
+SERVER_CERT=${HOST_IP}-server-cert.pem
+STRONGSWAN_KEY=strongswan-key.pem
+STRONGSWAN_CERT=strongswan-cert.pem

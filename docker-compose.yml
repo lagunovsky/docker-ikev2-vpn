@@ -15,8 +15,8 @@ services:
       - "500:500/udp"
       - "4500:4500/udp"
     volumes:
-      - ./data/ipsec.d:/data/ipsec.d
-      - ./data/profiles:/data/profiles
+      - ./data/ipsec.d:/etc/ipsec.d
+      - ./data/profiles:/profiles
     logging: &loggingConfig
       driver: json-file
       options:

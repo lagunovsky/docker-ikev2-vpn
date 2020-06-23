@@ -2,8 +2,8 @@
 
 . $(dirname "$0")/create-host-cert
 
-if [ ! -f /data/${STRONGSWAN_CERT} ]; then
-        cp ${CACERTS_PATH}/${STRONGSWAN_CERT} /data/${STRONGSWAN_CERT}
+if [ ! -f ${PROFILES_PATH}/${STRONGSWAN_CERT} ]; then
+        cp ${CACERTS_PATH}/${STRONGSWAN_CERT} ${PROFILES_PATH}/${STRONGSWAN_CERT}
 fi
 
 read -p "Client: " client
@@ -38,7 +38,7 @@ ipsec pki --pub --in ${PRIVATE_PATH}/${CLIENT_KEY} --type ecdsa | \
         --san ${client} \
         --outform pem > ${CERTS_PATH}/${CLIENT_CERT}
 
-cp ${CERTS_PATH}/${CLIENT_CERT} /data/${CLIENT_CERT}
+cp ${CERTS_PATH}/${CLIENT_CERT} ${PROFILES_PATH}/${CLIENT_CERT}
 
 echo "Exporting  ${client} certificate as PKCS#12 file...."
 
@@ -47,15 +47,15 @@ openssl pkcs12 -export -inkey ${PRIVATE_PATH}/${CLIENT_KEY} \
         -certfile ${CACERTS_PATH}/${STRONGSWAN_CERT} \
         -caname "${HOST_NAME} Root CA" \
         -passout pass:${password} \
-        -out /data/${CLIENT_P12}
+        -out ${PROFILES_PATH}/${CLIENT_P12}
 
 echo "Creating mobileconfig file...."
 
 if [ $emptypassword -eq 0 ];
 then
-        create-mobileconfig ${client} > /data/${client}.mobileconfig
+        create-mobileconfig ${client} > ${PROFILES_PATH}/${client}.mobileconfig
 else
-        create-mobileconfig ${client} ${password} > /data/${client}.mobileconfig
+        create-mobileconfig ${client} ${password} > ${PROFILES_PATH}/${client}.mobileconfig
 fi
 
 echo "Creating cert success"

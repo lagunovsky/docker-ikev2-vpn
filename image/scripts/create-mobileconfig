@@ -2,7 +2,7 @@
 
 
 CLIENT_P12=${1}-client.p12
-CERT_PAYLOAD=$(cat /data/${CLIENT_P12} | openssl enc -base64)
+CERT_PAYLOAD=$(cat ${PROFILES_PATH}/${CLIENT_P12} | openssl enc -base64)
 CERT_NAME=${CLIENT_P12}
 CLIENT_IDENTIFIER=${1}
 PROFILE_NAME="${HOST_NAME} (${1})"

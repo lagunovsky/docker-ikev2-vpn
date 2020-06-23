@@ -12,6 +12,7 @@ fi
 PRIVATE_PATH=/etc/ipsec.d/private
 CACERTS_PATH=/etc/ipsec.d/cacerts
 CERTS_PATH=/etc/ipsec.d/certs
+PROFILES_PATH=/data/profiles
 
 SERVER_CERT=${HOST_IP}-server-cert.pem
 STRONGSWAN_KEY=strongswan-key.pem

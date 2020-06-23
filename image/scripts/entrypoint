@@ -2,6 +2,10 @@
 
 set -e
 
+if [ -z "$(ls -A /etc/ipsec.d)" ]; then
+    cp -r /etc/ipsec.d.bk/* /etc/ipsec.d/
+fi
+
 if [ $# -eq 0 ]
 then
     create-host-cert

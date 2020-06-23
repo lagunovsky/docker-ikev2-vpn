@@ -6,12 +6,13 @@ RUN apk update && \
     cp /usr/bin/envsubst /usr/local/bin/envsubst && \
     cp /usr/bin/uuidgen /usr/local/bin/uuidgen && \
     apk del build_deps && rm -rf /var/cache/apk/* && \
-    mkdir /profiles
+    mkdir /profiles && \
+    mkdir /etc/ipsec.d.bk && cp -r /etc/ipsec.d/* /etc/ipsec.d.bk/
 
 COPY ./templates/ /var/templates/
 COPY ./scripts/ /usr/local/bin/
 
 EXPOSE 500:500/udp 4500:4500/udp
 
-VOLUME [ "/profiles", "/etc/ipsec.d" ]
+VOLUME [ "/data", "/etc/ipsec.d" ]
 ENTRYPOINT [ "/usr/local/bin/entrypoint" ]

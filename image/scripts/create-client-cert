@@ -6,7 +6,7 @@ if [ ! -f ${PROFILES_PATH}/${STRONGSWAN_CERT} ]; then
         cp ${CACERTS_PATH}/${STRONGSWAN_CERT} ${PROFILES_PATH}/${STRONGSWAN_CERT}
 fi
 
-read -p "Client: " client
+read -p "Client name (any, 'my-mac' for example): " client
 
 CLIENT_CERT=${client}-client-cert.pem
 CLIENT_KEY=${client}-client-key.pem

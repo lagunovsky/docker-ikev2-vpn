@@ -19,4 +19,7 @@ docker-compose exec ikev2 create-client-cert
 
 ### Installation on Mac
 
-Open `[name].mobileconfig` on Mac 
+Download `./data/profiles/[name].mobileconfig` and just open on your Mac
+
+#### Note
+IKEv2 and mobileconfig is supported on apple devices at the system level. No need to install additional software.

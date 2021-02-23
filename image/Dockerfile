@@ -1,4 +1,4 @@
-FROM alpine:3.12
+FROM alpine:3.13.2
 
 RUN apk update && \
     apk add openssl strongswan curl nano bash jq libintl libuuid && \

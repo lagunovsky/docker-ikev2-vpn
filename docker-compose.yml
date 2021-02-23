@@ -2,7 +2,7 @@ version: '3'
 
 services:
   ikev2:
-    image: lagun4ik/ikev2-vpn:${VERSION:-2.0.0}
+    image: lagun4ik/ikev2-vpn:${VERSION:-2.1.0}
     build:
       context: './image'
     restart: always

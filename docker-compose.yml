@@ -2,7 +2,7 @@ version: '3'
 
 services:
   ikev2:
-    image: lagun4ik/ikev2-vpn:${VERSION:-2.1.0}
+    image: ikev2-vpn:${VERSION:-2.1.0}
     build:
       context: './image'
     restart: always
@@ -17,7 +17,7 @@ services:
     volumes:
       - ./data/ipsec.d:/etc/ipsec.d
       - ./data/profiles:/profiles
-    logging: &loggingConfig
+    logging:
       driver: json-file
       options:
         max-size: 100m

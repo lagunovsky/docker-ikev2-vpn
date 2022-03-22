@@ -1,5 +1,18 @@
 # IKEv2 VPN Server on Docker
 
+### Configuration
+
+You can skip this step
+
+```bash
+cp .env.example .env
+```
+
+`HOST_NAME` is also name of the root certificate
+
+`HOST_COUNTRY` and `HOST_IP` are set automatically
+
+
 ### Start server
 
 ```bash
